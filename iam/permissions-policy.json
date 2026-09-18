@@ -1,0 +1,37 @@
+{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Sid": "LightsailContainers",
+      "Effect": "Allow",
+      "Action": [
+        "lightsail:GetContainerServices",
+        "lightsail:GetContainerServiceDeployments",
+        "lightsail:GetContainerImages",
+        "lightsail:CreateContainerServiceDeployment",
+        "lightsail:RegisterContainerImage",
+        "lightsail:DeleteContainerImage",
+        "lightsail:CreateContainerService",
+        "lightsail:UpdateContainerService",
+        "lightsail:GetContainerAPIMetadata",
+        "lightsail:GetBuckets",
+        "lightsail:CreateBucket",
+        "lightsail:PutBucketObject",
+        "lightsail:GetBucketAccessKeys",
+        "lightsail:CreateBucketAccessKey",
+        "lightsail:DownloadBucketObject",
+        "lightsail:GetContainerServicePowers"
+      ],
+      "Resource": "*"
+    },
+    {
+      "Sid": "EcrPublicForPushHelper",
+      "Effect": "Allow",
+      "Action": [
+        "ecr-public:GetAuthorizationToken",
+        "sts:GetServiceBearerToken"
+      ],
+      "Resource": "*"
+    }
+  ]
+}

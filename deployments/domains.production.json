@@ -1,0 +1,12 @@
+{
+  "production": [
+    {
+      "certificateName": "strivepay-production-cert",
+      "domainNames": [
+        "api.strivepay.io",
+        "app.strivepay.io",
+        "admin.strivepay.io"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,164 @@
+name: Initial full deploy + Postgres backup
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Target environment
+        required: true
+        type: choice
+        options: [staging, production]
+      action:
+        description: What to run
+        required: true
+        type: choice
+        options: [full-deploy, backup-only]
+  schedule:
+    # Daily 03:15 UTC
+    - cron: "15 3 * * *"
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  full-deploy:
+    if: github.event_name == 'workflow_dispatch' && inputs.action == 'full-deploy'
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION || 'eu-west-2' }}
+      SERVICE_NAME: ${{ vars.LIGHTSAIL_SERVICE_NAME || format('strivepay-{0}', inputs.environment) }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Install lightsailctl
+        run: |
+          curl -L -o /usr/local/bin/lightsailctl \
+            https://s3.us-west-2.amazonaws.com/lightsailctl/latest/linux-amd64/lightsailctl
+          chmod +x /usr/local/bin/lightsailctl
+      - uses: docker/setup-buildx-action@v3
+      - name: Build edge proxy
+        run: docker build -t strivepay-proxy:local ./proxy
+      - name: Push proxy
+        id: push
+        run: |
+          set -euo pipefail
+          out=$(aws lightsail push-container-image \
+            --region "$AWS_REGION" --service-name "$SERVICE_NAME" \
+            --label proxy --image strivepay-proxy:local 2>&1)
+          echo "$out"
+          ref=$(echo "$out" | sed -n 's/.*Refer to this image as "\([^"]*\)".*/\1/p' | tail -1)
+          echo "proxy_image=$ref" >> "$GITHUB_OUTPUT"
+      - name: Render full deployment from secrets
+        shell: pwsh
+        env:
+          PROXY_IMAGE: ${{ steps.push.outputs.proxy_image }}
+          API_IMAGE: ${{ secrets.SEED_API_IMAGE }}
+          WORKER_IMAGE: ${{ secrets.SEED_WORKER_IMAGE }}
+          CONSUMER_WEB_IMAGE: ${{ secrets.SEED_CONSUMER_WEB_IMAGE }}
+          ADMIN_WEB_IMAGE: ${{ secrets.SEED_ADMIN_WEB_IMAGE }}
+          POSTGRES_PASSWORD: ${{ secrets.POSTGRES_PASSWORD }}
+          DATA_ENCRYPTION_KEY: ${{ secrets.STRIVEPAY_DATA_ENCRYPTION_KEY }}
+          SMTP_HOST: ${{ secrets.STRIVEPAY_SMTP_HOST }}
+          SMTP_PORT: ${{ secrets.STRIVEPAY_SMTP_PORT }}
+          SMTP_USERNAME: ${{ secrets.STRIVEPAY_SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.STRIVEPAY_SMTP_PASSWORD }}
+          SMTP_FROM: ${{ secrets.STRIVEPAY_SMTP_FROM }}
+          ADMIN_EMAIL: ${{ secrets.STRIVEPAY_ADMIN_EMAIL }}
+          ADMIN_PASSWORD: ${{ secrets.STRIVEPAY_ADMIN_PASSWORD }}
+          BAKKT_BASE_URL: ${{ secrets.STRIVEPAY_BAKKT_BASE_URL }}
+          BAKKT_API_KEY: ${{ secrets.STRIVEPAY_BAKKT_API_KEY }}
+          BAKKT_WEBHOOK_SECRET: ${{ secrets.STRIVEPAY_BAKKT_WEBHOOK_SECRET }}
+          QUIDAX_API_KEY: ${{ secrets.STRIVEPAY_QUIDAX_API_KEY }}
+          QUIDAX_WEBHOOK_SECRET: ${{ secrets.STRIVEPAY_QUIDAX_WEBHOOK_SECRET }}
+          FCM_PROJECT_ID: ${{ secrets.STRIVEPAY_FCM_PROJECT_ID }}
+        run: |
+          $tags = @{
+            proxy = ($env:PROXY_IMAGE).TrimStart(':')
+            api = if ($env:API_IMAGE) { ($env:API_IMAGE).TrimStart(':') } else { 'PLACEHOLDER' }
+            worker = if ($env:WORKER_IMAGE) { ($env:WORKER_IMAGE).TrimStart(':') } else { 'PLACEHOLDER' }
+            'consumer-web' = if ($env:CONSUMER_WEB_IMAGE) { ($env:CONSUMER_WEB_IMAGE).TrimStart(':') } else { 'PLACEHOLDER' }
+            'admin-web' = if ($env:ADMIN_WEB_IMAGE) { ($env:ADMIN_WEB_IMAGE).TrimStart(':') } else { 'PLACEHOLDER' }
+          }
+          $secrets = @{
+            POSTGRES_PASSWORD_VALUE = $env:POSTGRES_PASSWORD
+            DATA_ENCRYPTION_KEY_VALUE = $env:DATA_ENCRYPTION_KEY
+            SMTP_HOST_VALUE = $env:SMTP_HOST
+            SMTP_PORT_VALUE = $env:SMTP_PORT
+            SMTP_USERNAME_VALUE = $env:SMTP_USERNAME
+            SMTP_PASSWORD_VALUE = $env:SMTP_PASSWORD
+            SMTP_FROM_VALUE = $env:SMTP_FROM
+            ADMIN_EMAIL_VALUE = $env:ADMIN_EMAIL
+            ADMIN_PASSWORD_VALUE = $env:ADMIN_PASSWORD
+            BAKKT_BASE_URL_VALUE = $env:BAKKT_BASE_URL
+            BAKKT_API_KEY_VALUE = $env:BAKKT_API_KEY
+            BAKKT_WEBHOOK_SECRET_VALUE = $env:BAKKT_WEBHOOK_SECRET
+            QUIDAX_API_KEY_VALUE = $env:QUIDAX_API_KEY
+            QUIDAX_WEBHOOK_SECRET_VALUE = $env:QUIDAX_WEBHOOK_SECRET
+            FCM_PROJECT_ID_VALUE = $env:FCM_PROJECT_ID
+          }
+          & ./scripts/Build-StrivePayDeployment.ps1 `
+            -Environment ${{ inputs.environment }} `
+            -ImageTags $tags `
+            -Secrets $secrets `
+            -OutFile ./deployment.raw.json
+          $raw = Get-Content -Raw ./deployment.raw.json | ConvertFrom-Json
+          $wrapped = @{
+            serviceName = $env:SERVICE_NAME
+            containers = $raw.containers
+            publicEndpoint = $raw.publicEndpoint
+          }
+          $wrapped | ConvertTo-Json -Depth 20 | Set-Content ./deployment.json
+      - name: Deploy
+        run: |
+          aws lightsail create-container-service-deployment \
+            --region "$AWS_REGION" \
+            --cli-input-json file://deployment.json
+
+  backup:
+    if: github.event_name == 'schedule' || (github.event_name == 'workflow_dispatch' && inputs.action == 'backup-only')
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        environment: ${{ github.event_name == 'schedule' && fromJSON('["staging","production"]') || fromJSON(format('["{0}"]', inputs.environment)) }}
+    environment: ${{ matrix.environment }}
+    env:
+      AWS_REGION: ${{ vars.AWS_REGION || 'eu-west-2' }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: aws-actions/configure-aws-credentials@v4
+        with:
+          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+          aws-region: ${{ env.AWS_REGION }}
+      - name: Install PostgreSQL client
+        run: sudo apt-get update && sudo apt-get install -y postgresql-client
+      - name: Dump and upload
+        env:
+          DATABASE_URL: ${{ secrets.BACKUP_DATABASE_URL }}
+          ENVIRONMENT: ${{ matrix.environment }}
+        run: |
+          set -euo pipefail
+          if [ -z "${DATABASE_URL:-}" ]; then
+            echo "BACKUP_DATABASE_URL not set for ${ENVIRONMENT}; skipping dump."
+            echo "Configure a reachable URL (bastion/VPN) per docs/postgres-backup-restore.md"
+            exit 0
+          fi
+          stamp=$(date -u +%Y%m%d-%H%M%S)
+          file="/tmp/strivepay-${ENVIRONMENT}-${stamp}.sql.gz"
+          bucket="strivepay-db-dumps-${ENVIRONMENT}"
+          pg_dump "$DATABASE_URL" | gzip > "$file"
+          # Prefer Lightsail object put when supported; else S3-compatible keys
+          if aws lightsail put-bucket-object \
+              --region "$AWS_REGION" \
+              --bucket-name "$bucket" \
+              --key "postgres/${ENVIRONMENT}/${stamp}.sql.gz" \
+              --body "$file"; then
+            echo "Uploaded via put-bucket-object"
+          else
+            echo "put-bucket-object failed; ensure bucket access keys + aws s3 cp endpoint are configured"
+            exit 1
+          fi

@@ -1,0 +1,26 @@
+﻿{
+  "Version": "2012-10-17",
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": {
+        "Federated": "None"
+      },
+      "Action": "sts:AssumeRoleWithWebIdentity",
+      "Condition": {
+        "StringEquals": {
+          "token.actions.githubusercontent.com:aud": "sts.amazonaws.com"
+        },
+        "StringLike": {
+          "token.actions.githubusercontent.com:sub": [
+            "repo:Payblendio/strivepay-api:*",
+            "repo:Payblendio/strivepay-consumer-web:*",
+            "repo:Payblendio/strivepay-admin-web:*",
+            "repo:Payblendio/strivepay-infra:*"
+          ]
+        }
+      }
+    }
+  ]
+}
+

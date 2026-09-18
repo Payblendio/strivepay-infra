@@ -1,0 +1,120 @@
+{
+  "containers": {
+    "proxy": {
+      "image": ":proxy.IMAGE_TAG",
+      "ports": {
+        "80": "HTTP"
+      },
+      "environment": {
+        "API_HOST": "API_HOST_VALUE",
+        "APP_HOST": "APP_HOST_VALUE",
+        "ADMIN_HOST": "ADMIN_HOST_VALUE"
+      }
+    },
+    "api": {
+      "image": ":api.IMAGE_TAG",
+      "environment": {
+        "STRIVEPAY_ENVIRONMENT": "STRIVEPAY_ENVIRONMENT_VALUE",
+        "STRIVEPAY_SIMULATOR_ENABLED": "false",
+        "STRIVEPAY_HTTP_ADDRESS": "0.0.0.0",
+        "STRIVEPAY_HTTP_PORT": "18080",
+        "STRIVEPAY_FORWARD_HEADERS_STRATEGY": "NATIVE",
+        "STRIVEPAY_DB_URL": "jdbc:postgresql://postgres:5432/strivepay_consumer",
+        "STRIVEPAY_DB_USERNAME": "strivepay",
+        "STRIVEPAY_DB_PASSWORD": "POSTGRES_PASSWORD_VALUE",
+        "STRIVEPAY_DATA_ENCRYPTION_KEY": "DATA_ENCRYPTION_KEY_VALUE",
+        "STRIVEPAY_WEB_BASE_URL": "https://APP_HOST_VALUE",
+        "STRIVEPAY_SUPPORT_CUSTOMER_URL": "https://APP_HOST_VALUE/dashboard/support",
+        "STRIVEPAY_SUPPORT_ALLOWED_ORIGINS": "https://APP_HOST_VALUE",
+        "STRIVEPAY_SMTP_ENABLED": "true",
+        "STRIVEPAY_SMTP_STARTTLS_ENABLED": "SMTP_STARTTLS_VALUE",
+        "STRIVEPAY_SMTP_HOST": "SMTP_HOST_VALUE",
+        "STRIVEPAY_SMTP_PORT": "SMTP_PORT_VALUE",
+        "STRIVEPAY_SMTP_USERNAME": "SMTP_USERNAME_VALUE",
+        "STRIVEPAY_SMTP_PASSWORD": "SMTP_PASSWORD_VALUE",
+        "STRIVEPAY_SMTP_FROM": "SMTP_FROM_VALUE",
+        "STRIVEPAY_ADMIN_EMAIL": "ADMIN_EMAIL_VALUE",
+        "STRIVEPAY_ADMIN_PASSWORD": "ADMIN_PASSWORD_VALUE",
+        "STRIVEPAY_BAKKT_MODE": "BAKKT_MODE_VALUE",
+        "STRIVEPAY_BAKKT_BASE_URL": "BAKKT_BASE_URL_VALUE",
+        "STRIVEPAY_BAKKT_API_KEY": "BAKKT_API_KEY_VALUE",
+        "STRIVEPAY_BAKKT_WEBHOOK_SECRET": "BAKKT_WEBHOOK_SECRET_VALUE",
+        "STRIVEPAY_QUIDAX_MODE": "QUIDAX_MODE_VALUE",
+        "STRIVEPAY_QUIDAX_API_KEY": "QUIDAX_API_KEY_VALUE",
+        "STRIVEPAY_QUIDAX_WEBHOOK_SECRET": "QUIDAX_WEBHOOK_SECRET_VALUE",
+        "STRIVEPAY_DOT_ENABLED": "DOT_ENABLED_VALUE",
+        "STRIVEPAY_PUSH_ENABLED": "true",
+        "STRIVEPAY_FCM_PROJECT_ID": "FCM_PROJECT_ID_VALUE",
+        "STRIVEPAY_FCM_CREDENTIALS_PATH": "/opt/strivepay/credentials/fcm-v1-service-account.json"
+      }
+    },
+    "worker": {
+      "image": ":worker.IMAGE_TAG",
+      "environment": {
+        "STRIVEPAY_ENVIRONMENT": "STRIVEPAY_ENVIRONMENT_VALUE",
+        "STRIVEPAY_SIMULATOR_ENABLED": "false",
+        "STRIVEPAY_DB_URL": "jdbc:postgresql://postgres:5432/strivepay_consumer",
+        "STRIVEPAY_DB_USERNAME": "strivepay",
+        "STRIVEPAY_DB_PASSWORD": "POSTGRES_PASSWORD_VALUE",
+        "STRIVEPAY_DATA_ENCRYPTION_KEY": "DATA_ENCRYPTION_KEY_VALUE",
+        "STRIVEPAY_SMTP_ENABLED": "true",
+        "STRIVEPAY_SMTP_STARTTLS_ENABLED": "SMTP_STARTTLS_VALUE",
+        "STRIVEPAY_SMTP_HOST": "SMTP_HOST_VALUE",
+        "STRIVEPAY_SMTP_PORT": "SMTP_PORT_VALUE",
+        "STRIVEPAY_SMTP_USERNAME": "SMTP_USERNAME_VALUE",
+        "STRIVEPAY_SMTP_PASSWORD": "SMTP_PASSWORD_VALUE",
+        "STRIVEPAY_SMTP_FROM": "SMTP_FROM_VALUE",
+        "STRIVEPAY_BAKKT_MODE": "BAKKT_MODE_VALUE",
+        "STRIVEPAY_BAKKT_BASE_URL": "BAKKT_BASE_URL_VALUE",
+        "STRIVEPAY_BAKKT_API_KEY": "BAKKT_API_KEY_VALUE",
+        "STRIVEPAY_BAKKT_WEBHOOK_SECRET": "BAKKT_WEBHOOK_SECRET_VALUE",
+        "STRIVEPAY_QUIDAX_MODE": "QUIDAX_MODE_VALUE",
+        "STRIVEPAY_QUIDAX_API_KEY": "QUIDAX_API_KEY_VALUE",
+        "STRIVEPAY_QUIDAX_WEBHOOK_SECRET": "QUIDAX_WEBHOOK_SECRET_VALUE",
+        "STRIVEPAY_DOT_ENABLED": "DOT_ENABLED_VALUE",
+        "STRIVEPAY_PUSH_ENABLED": "true",
+        "STRIVEPAY_FCM_PROJECT_ID": "FCM_PROJECT_ID_VALUE",
+        "STRIVEPAY_FCM_CREDENTIALS_PATH": "/opt/strivepay/credentials/fcm-v1-service-account.json"
+      }
+    },
+    "consumer-web": {
+      "image": ":consumer-web.IMAGE_TAG",
+      "environment": {
+        "HOSTNAME": "0.0.0.0",
+        "PORT": "18081",
+        "CONSUMER_API_URL": "https://API_HOST_VALUE",
+        "NEXT_PUBLIC_APP_URL": "https://APP_HOST_VALUE"
+      }
+    },
+    "admin-web": {
+      "image": ":admin-web.IMAGE_TAG",
+      "environment": {
+        "HOSTNAME": "0.0.0.0",
+        "PORT": "18082",
+        "ADMIN_API_URL": "https://API_HOST_VALUE",
+        "NEXT_PUBLIC_APP_URL": "https://ADMIN_HOST_VALUE"
+      }
+    },
+    "postgres": {
+      "image": "postgres:18-alpine",
+      "environment": {
+        "POSTGRES_DB": "strivepay_consumer",
+        "POSTGRES_USER": "strivepay",
+        "POSTGRES_PASSWORD": "POSTGRES_PASSWORD_VALUE",
+        "PGDATA": "/var/lib/postgresql/data/pgdata"
+      }
+    }
+  },
+  "publicEndpoint": {
+    "containerName": "proxy",
+    "containerPort": 80,
+    "healthCheck": {
+      "healthyThreshold": 2,
+      "unhealthyThreshold": 2,
+      "timeoutSeconds": 5,
+      "intervalSeconds": 15,
+      "path": "/",
+      "successCodes": "200-399"
+    }
+  }
+}

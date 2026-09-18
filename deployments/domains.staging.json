@@ -1,0 +1,12 @@
+{
+  "staging": [
+    {
+      "certificateName": "strivepay-staging-cert",
+      "domainNames": [
+        "api.staging.strivepay.io",
+        "app.staging.strivepay.io",
+        "admin.staging.strivepay.io"
+      ]
+    }
+  ]
+}
