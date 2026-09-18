@@ -1,35 +1,56 @@
-# Staging env file for GitHub sync (no secrets committed)
+# Sync GitHub Environment secrets / variables
 
-Copy `secrets/staging.zeptomail.env` (generated locally) or build `secrets/staging.env` from
-`consumer-api/.env`, then run:
+## See what is set
+
+```cmd
+gh variable list -R Payblendio/strivepay-api -e staging
+gh secret list -R Payblendio/strivepay-api -e staging
+```
+
+Secret **values** are never shown after save—only names.
+
+## Full sync from a file
 
 ```cmd
 cd strivepay-infra
 scripts\Set-StrivePayGitHubEnv.cmd staging
+scripts\Set-StrivePayGitHubEnv.cmd staging --file secrets\staging.env
 ```
 
-Or with an explicit file:
+## Manual update (no `.env`)
+
+Use this for staging public URLs so LAN IPs from `consumer-api/.env` are not copied:
 
 ```cmd
-scripts\Set-StrivePayGitHubEnv.cmd staging secrets\staging.env
+cd strivepay-infra
+scripts\Set-StrivePayGitHubEnv.cmd staging --manual ^
+  STRIVEPAY_WEB_BASE_URL=https://staging.strivepay.io ^
+  STRIVEPAY_SUPPORT_CUSTOMER_URL=https://staging.strivepay.io/dashboard/support ^
+  STRIVEPAY_SUPPORT_ALLOWED_ORIGINS=https://staging.strivepay.io,https://cockpit.staging.strivepay.io ^
+  STRIVEPAY_SAFEHAVEN_CALLBACK_URL=https://api.staging.strivepay.io/webhooks/ngn-bank
 ```
 
-Dry run:
+Or one key with `gh` directly:
 
 ```cmd
-scripts\Set-StrivePayGitHubEnv.cmd staging --dry-run
+gh variable set STRIVEPAY_WEB_BASE_URL -R Payblendio/strivepay-api -e staging -b "https://staging.strivepay.io"
+gh secret set STRIVEPAY_ADMIN_PASSWORD -R Payblendio/strivepay-api -e staging
 ```
 
-## ZeptoMail note
+(`gh secret set` without `-b` prompts for the value.)
 
-Legacy PHP StrivePay stored ZeptoMail in **DB** (`settings.smtp_details`: `zeptomail_apikey`, `zeptomail_sendfrom`), not `.env`.
-The new API uses env:
+## Dry run
+
+```cmd
+scripts\Set-StrivePayGitHubEnv.cmd staging --manual --dry-run STRIVEPAY_WEB_BASE_URL=https://staging.strivepay.io
+```
+
+## ZeptoMail
+
+Legacy PHP stored ZeptoMail in **DB**, not `.env`. Staging uses:
 
 | Key | Purpose |
 |---|---|
-| `STRIVEPAY_EMAIL_PROVIDER=zeptomail` | Use HTTP API (like legacy) |
-| `STRIVEPAY_ZEPTOMAIL_API_KEY` | Zoho Send Mail token (`Zoho-enczapikey …`) |
+| `STRIVEPAY_EMAIL_PROVIDER=zeptomail` | HTTP API |
+| `STRIVEPAY_ZEPTOMAIL_API_KEY` | Send Mail token |
 | `STRIVEPAY_ZEPTOMAIL_FROM` | e.g. `notify@strivepay.io` |
-| `STRIVEPAY_ZEPTOMAIL_FROM_NAME` | `StrivePay` |
-
-SMTP fallback (optional): `smtp.zeptomail.com:587`, user `emailapikey`, password = token.
