@@ -17,26 +17,27 @@ $ErrorActionPreference = "Stop"
 $service = "strivepay-$Environment"
 $DeploymentFile = (Resolve-Path $DeploymentFile).Path
 
-$payload = Get-Content -Raw -Path $DeploymentFile | ConvertFrom-Json
-if (-not $payload.serviceName) {
-  $obj = Get-Content -Raw -Path $DeploymentFile | ConvertFrom-Json
-  $wrapped = @{
-    serviceName    = $service
-    containers     = $obj.containers
-    publicEndpoint = $obj.publicEndpoint
-  }
-  $tmp = Join-Path $env:TEMP "lightsail-deploy-$service.json"
-  ($wrapped | ConvertTo-Json -Depth 20) | Set-Content -Path $tmp -Encoding utf8
-  $DeploymentFile = $tmp
-}
+$containersPath = Join-Path $env:TEMP "lightsail-$service-containers.json"
+$endpointPath = Join-Path $env:TEMP "lightsail-$service-endpoint.json"
 
-# AWS CLI on Windows wants file:// with forward slashes
-$uri = "file://" + ($DeploymentFile -replace '\\', '/')
+python -c @"
+import json, sys
+d = json.load(open(r'$DeploymentFile'))
+containers = d.get('containers') or d
+endpoint = d.get('publicEndpoint')
+if not endpoint:
+    raise SystemExit('publicEndpoint missing')
+json.dump(containers, open(r'$containersPath', 'w'))
+json.dump(endpoint, open(r'$endpointPath', 'w'))
+print('split ok')
+"@
 
 Write-Host "Deploying $DeploymentFile to $service ($Region)..."
 aws lightsail create-container-service-deployment `
   --region $Region `
-  --cli-input-json $uri | Out-Host
+  --service-name $service `
+  --containers "file://$containersPath" `
+  --public-endpoint "file://$endpointPath" | Out-Host
 
 Write-Host "Waiting for deployment..."
 do {

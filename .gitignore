@@ -15,3 +15,8 @@ out/
 coverage/
 tmp/
 .debug/
+
+secrets/*.local.env
+
+deployments/*.smoke.json
+deployments/*.smoke.*.json
