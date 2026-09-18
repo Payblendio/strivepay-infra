@@ -43,6 +43,7 @@ $hostDefaults = @{
     QUIDAX_MODE = "SANDBOX"
     DOT_ENABLED = "false"
     SMTP_STARTTLS = "true"
+    EMAIL_PROVIDER = "zeptomail"
   }
   production = @{
     API_HOST   = "api.strivepay.io"
@@ -53,6 +54,7 @@ $hostDefaults = @{
     QUIDAX_MODE = "LIVE"
     DOT_ENABLED = "true"
     SMTP_STARTTLS = "true"
+    EMAIL_PROVIDER = "zeptomail"
   }
 }
 
@@ -73,6 +75,7 @@ $json = $json.Replace("BAKKT_MODE_VALUE", $cfg.BAKKT_MODE)
 $json = $json.Replace("QUIDAX_MODE_VALUE", $cfg.QUIDAX_MODE)
 $json = $json.Replace("DOT_ENABLED_VALUE", $cfg.DOT_ENABLED)
 $json = $json.Replace("SMTP_STARTTLS_VALUE", $cfg.SMTP_STARTTLS)
+$json = $json.Replace("EMAIL_PROVIDER_VALUE", $cfg.EMAIL_PROVIDER)
 
 foreach ($key in $Secrets.Keys) {
   $json = $json.Replace($key, [string]$Secrets[$key])

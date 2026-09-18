@@ -29,11 +29,11 @@ Also mirror into the Lightsail deployment via Actions (env → deployment JSON).
 | `STRIVEPAY_DATA_ENCRYPTION_KEY` | 32-byte key (base64/hex per app convention) |
 | `STRIVEPAY_ADMIN_EMAIL` | Bootstrap admin |
 | `STRIVEPAY_ADMIN_PASSWORD` | Bootstrap admin |
-| `STRIVEPAY_SMTP_HOST` | |
-| `STRIVEPAY_SMTP_PORT` | |
-| `STRIVEPAY_SMTP_USERNAME` | |
-| `STRIVEPAY_SMTP_PASSWORD` | |
-| `STRIVEPAY_SMTP_FROM` | |
+| `STRIVEPAY_SMTP_*` | Optional SMTP fallback (`smtp.zeptomail.com`) |
+| `STRIVEPAY_EMAIL_PROVIDER` | `zeptomail` for staging |
+| `STRIVEPAY_ZEPTOMAIL_API_KEY` | From legacy DB `smtp_details.zeptomail_apikey` |
+| `STRIVEPAY_ZEPTOMAIL_FROM` | e.g. `notify@strivepay.io` |
+| `STRIVEPAY_ZEPTOMAIL_FROM_NAME` | `StrivePay` |
 | `STRIVEPAY_BAKKT_BASE_URL` | Sandbox Bakkt URL |
 | `STRIVEPAY_BAKKT_API_KEY` | |
 | `STRIVEPAY_BAKKT_WEBHOOK_SECRET` | |

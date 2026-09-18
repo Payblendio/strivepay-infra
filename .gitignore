@@ -20,3 +20,7 @@ secrets/*.local.env
 
 deployments/*.smoke.json
 deployments/*.smoke.*.json
+
+secrets/*.zeptomail.env
+secrets/staging.env
+secrets/*.local.env
