@@ -88,6 +88,6 @@ if ($json -match "IMAGE_TAG|_VALUE") {
 
 # Normalize Lightsail image refs: values are already "service.container.version" without leading colon in push output;
 # template used ":name.IMAGE_TAG" so after replace we get ":service.container.N" which Lightsail expects.
-Set-Content -Path $OutFile -Value $json -Encoding utf8NoBOM
+[System.IO.File]::WriteAllText($OutFile, $json)
 Write-Host "Wrote $OutFile"
 return $OutFile

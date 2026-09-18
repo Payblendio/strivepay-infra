@@ -30,11 +30,14 @@ aws lightsail create-certificate `
 # Complete DNS validation CNAMEs shown in:
 aws lightsail get-certificates --region eu-west-2 --certificate-name strivepay-staging-cert
 
+# domains.staging.json must be Lightsail map shape: { "cert-name": ["host1","host2"] }
 aws lightsail update-container-service `
   --region eu-west-2 `
   --service-name strivepay-staging `
   --public-domain-names file://deployments/domains.staging.json
 ```
+
+Or run `.\scripts\Attach-StrivePayStagingDomains.ps1` after ACM DNS validation CNAMEs are live.
 
 Proxy env must match: `API_HOST`, `APP_HOST` (= consumer), `ADMIN_HOST` (= cockpit).
 

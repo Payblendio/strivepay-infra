@@ -1,12 +1,7 @@
 {
-  "staging": [
-    {
-      "certificateName": "strivepay-staging-cert",
-      "domainNames": [
-        "api.staging.strivepay.io",
-        "staging.strivepay.io",
-        "cockpit.staging.strivepay.io"
-      ]
-    }
+  "strivepay-staging-cert": [
+    "api.staging.strivepay.io",
+    "staging.strivepay.io",
+    "cockpit.staging.strivepay.io"
   ]
 }

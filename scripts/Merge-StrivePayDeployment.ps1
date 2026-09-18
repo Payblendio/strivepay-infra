@@ -60,6 +60,21 @@ foreach ($prop in $dep.containers.PSObject.Properties) {
   $containers[$name] = $entry
 }
 
+# Add containers present in ImageUpdates but missing from the current deployment (e.g. first api push after proxy-only smoke).
+foreach ($name in $ImageUpdates.Keys) {
+  if ($containers.ContainsKey($name)) { continue }
+  $img = [string]$ImageUpdates[$name]
+  if (-not $img.StartsWith(":")) { $img = ":$img" }
+  $entry = @{ image = $img }
+  if ($EnvironmentOverrides.ContainsKey($name)) {
+    $entry.environment = @{}
+    foreach ($ek in $EnvironmentOverrides[$name].Keys) {
+      $entry.environment[$ek] = [string]$EnvironmentOverrides[$name][$ek]
+    }
+  }
+  $containers[$name] = $entry
+}
+
 $pe = $dep.publicEndpoint
 $publicEndpoint = @{
   containerName = [string]$pe.containerName

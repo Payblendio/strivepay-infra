@@ -1,12 +1,7 @@
 {
-  "production": [
-    {
-      "certificateName": "strivepay-production-cert",
-      "domainNames": [
-        "api.strivepay.io",
-        "strivepay.io",
-        "cockpit.strivepay.io"
-      ]
-    }
+  "strivepay-production-cert": [
+    "api.strivepay.io",
+    "strivepay.io",
+    "cockpit.strivepay.io"
   ]
 }
