@@ -2,6 +2,7 @@
   "Version": "2012-10-17",
   "Statement": [
     {
+      "Sid": "GitHubActionsStrivePayImmutable",
       "Effect": "Allow",
       "Principal": {
         "Federated": "OIDC_PROVIDER_ARN"
@@ -13,10 +14,10 @@
         },
         "StringLike": {
           "token.actions.githubusercontent.com:sub": [
-            "repo:Payblendio/strivepay-api:*",
-            "repo:Payblendio/strivepay-consumer-web:*",
-            "repo:Payblendio/strivepay-admin-web:*",
-            "repo:Payblendio/strivepay-infra:*"
+            "repo:Payblendio@146183034/strivepay-api@1375813467:*",
+            "repo:Payblendio@146183034/strivepay-consumer-web@1375814735:*",
+            "repo:Payblendio@146183034/strivepay-admin-web@1375815503:*",
+            "repo:Payblendio@146183034/strivepay-infra@1375818332:*"
           ]
         }
       }
