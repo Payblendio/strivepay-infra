@@ -17,7 +17,7 @@ Checks:
 
 - [ ] Proxy returns 200 on `/`
 - [ ] API health via `https://api.staging.strivepay.io/...`
-- [ ] Consumer login at `https://app.staging.strivepay.io`
-- [ ] Admin login at `https://admin.staging.strivepay.io`
+- [ ] Consumer login at `https://staging.strivepay.io`
+- [ ] Admin login at `https://cockpit.staging.strivepay.io`
 - [ ] Flyway applied (api logs / schema_version)
 - [ ] Postgres not publicly reachable

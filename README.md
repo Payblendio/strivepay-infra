@@ -46,4 +46,4 @@ aws lightsail update-container-service `
   --public-domain-names file://domains.staging.json
 ```
 
-Point DNS CNAMEs for `api|app|admin.staging.strivepay.io` at the Lightsail service URL.
+Point DNS CNAMEs for `api.staging`, `cockpit.staging`, and `staging` at the Lightsail service URL (see `docs/domains-https.md`).

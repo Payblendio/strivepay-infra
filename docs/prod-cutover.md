@@ -26,8 +26,8 @@ aws lightsail update-container-service `
 
 3. Point DNS CNAMEs:
    - `api.strivepay.io` → Lightsail production service URL
-   - `app.strivepay.io` → same
-   - `admin.strivepay.io` → same
+   - `strivepay.io` → same (consumer)
+   - `cockpit.strivepay.io` → same (admin)
 4. Confirm HTTPS and Host-based routing via Caddy (`API_HOST` / `APP_HOST` / `ADMIN_HOST`).
 5. Disable simulator: `STRIVEPAY_SIMULATOR_ENABLED=false` (already in template).
 6. Confirm daily dump workflow + restore drill (`docs/postgres-backup-restore.md`).

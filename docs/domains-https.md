@@ -1,15 +1,31 @@
 # Domain + HTTPS attachment
 
-## Staging
+Lightsail Container Services have **no static IP** for Cloudflare `A` records. Use **CNAME** to the service hostname.
 
-After the container service is READY and first deployment succeeded:
+## Staging Cloudflare DNS
+
+Target: `strivepay-staging.jsa9vsb7w2q98.eu-west-2.cs.amazonlightsail.com`
+
+| Type | Name | Content |
+|---|---|---|
+| CNAME | `api.staging` | `strivepay-staging.jsa9vsb7w2q98.eu-west-2.cs.amazonlightsail.com` |
+| CNAME | `cockpit.staging` | same |
+| CNAME | `staging` | same |
+
+Hosts:
+
+- API: `api.staging.strivepay.io`
+- Admin (cockpit): `cockpit.staging.strivepay.io`
+- Consumer web: `staging.strivepay.io`
+
+## Lightsail certificate + attach
 
 ```powershell
 aws lightsail create-certificate `
   --region eu-west-2 `
   --certificate-name strivepay-staging-cert `
   --domain-name api.staging.strivepay.io `
-  --subject-alternative-names app.staging.strivepay.io admin.staging.strivepay.io
+  --subject-alternative-names staging.strivepay.io cockpit.staging.strivepay.io
 
 # Complete DNS validation CNAMEs shown in:
 aws lightsail get-certificates --region eu-west-2 --certificate-name strivepay-staging-cert
@@ -20,11 +36,16 @@ aws lightsail update-container-service `
   --public-domain-names file://deployments/domains.staging.json
 ```
 
-Point DNS CNAMEs for the three hosts at the Lightsail service URL
-(`strivepay-staging.<id>.eu-west-2.cs.amazonlightsail.com`).
+Proxy env must match: `API_HOST`, `APP_HOST` (= consumer), `ADMIN_HOST` (= cockpit).
 
 ## Production
 
-Same flow with `strivepay-production-cert` and `domains.production.json`.
+Target: `strivepay-production.jsa9vsb7w2q98.eu-west-2.cs.amazonlightsail.com`
 
-Lightsail terminates TLS at the service edge; Caddy routes by `Host` header to api / consumer-web / admin-web.
+| Host | Purpose |
+|---|---|
+| `api.strivepay.io` | API |
+| `cockpit.strivepay.io` | Admin |
+| `strivepay.io` | Consumer web |
+
+Same certificate + `domains.production.json` flow.

@@ -28,11 +28,11 @@ Create Environments `staging` and `production` on:
 | `AWS_REGION` | `eu-west-2` | `eu-west-2` |
 | `LIGHTSAIL_SERVICE_NAME` | `strivepay-staging` | `strivepay-production` |
 | `API_HOST` | `api.staging.strivepay.io` | `api.strivepay.io` |
-| `APP_HOST` | `app.staging.strivepay.io` | `app.strivepay.io` |
-| `ADMIN_HOST` | `admin.staging.strivepay.io` | `admin.strivepay.io` |
+| `APP_HOST` (consumer) | `staging.strivepay.io` | `strivepay.io` |
+| `ADMIN_HOST` (cockpit) | `cockpit.staging.strivepay.io` | `cockpit.strivepay.io` |
 | `CONSUMER_API_URL` | `https://api.staging.strivepay.io` | `https://api.strivepay.io` |
 | `ADMIN_API_URL` | `https://api.staging.strivepay.io` | `https://api.strivepay.io` |
-| `NEXT_PUBLIC_APP_URL` | app/admin host as appropriate | same |
+| `NEXT_PUBLIC_APP_URL` | consumer / cockpit host as appropriate | same |
 
 ### App secrets
 

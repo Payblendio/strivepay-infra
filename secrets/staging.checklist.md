@@ -47,16 +47,16 @@ Also mirror into the Lightsail deployment via Actions (env → deployment JSON).
 | Variable | Example |
 |---|---|
 | `API_HOST` | `api.staging.strivepay.io` |
-| `APP_HOST` | `app.staging.strivepay.io` |
-| `ADMIN_HOST` | `admin.staging.strivepay.io` |
+| `APP_HOST` | `staging.strivepay.io` (consumer web) |
+| `ADMIN_HOST` | `cockpit.staging.strivepay.io` |
 
 ## Webs
 
 | Secret / var | Notes |
 |---|---|
 | `CONSUMER_API_URL` | `https://api.staging.strivepay.io` |
-| `NEXT_PUBLIC_APP_URL` (consumer) | `https://app.staging.strivepay.io` |
+| `NEXT_PUBLIC_APP_URL` (consumer) | `https://staging.strivepay.io` |
 | `ADMIN_API_URL` | `https://api.staging.strivepay.io` |
-| `NEXT_PUBLIC_APP_URL` (admin) | `https://admin.staging.strivepay.io` |
+| `NEXT_PUBLIC_APP_URL` (admin) | `https://cockpit.staging.strivepay.io` |
 
 Environment: `STRIVEPAY_ENVIRONMENT=SANDBOX`, simulator off, Bakkt/Quidax sandbox modes.

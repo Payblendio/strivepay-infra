@@ -4,8 +4,8 @@
       "certificateName": "strivepay-production-cert",
       "domainNames": [
         "api.strivepay.io",
-        "app.strivepay.io",
-        "admin.strivepay.io"
+        "strivepay.io",
+        "cockpit.strivepay.io"
       ]
     }
   ]

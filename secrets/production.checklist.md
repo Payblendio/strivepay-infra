@@ -12,7 +12,7 @@ Same keys as staging, with live values:
 | `STRIVEPAY_BAKKT_*` | Live Bakkt credentials |
 | `STRIVEPAY_QUIDAX_*` | Live Quidax credentials |
 | `STRIVEPAY_DOT_ENABLED` | `true` |
-| Hosts | `api.strivepay.io`, `app.strivepay.io`, `admin.strivepay.io` |
+| Hosts | `api.strivepay.io`, `strivepay.io` (consumer), `cockpit.strivepay.io` |
 
 Environment: `STRIVEPAY_ENVIRONMENT=PRODUCTION`, simulator off.
 
