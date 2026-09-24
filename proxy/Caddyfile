@@ -1,22 +1,35 @@
 {
 	admin off
 	auto_https off
+	servers {
+		# Keep the Lightsail load balancer's X-Forwarded-For so the API can geolocate the real client.
+		trusted_proxies static private_ranges
+	}
 }
 
 :80 {
 	@api host {$API_HOST}
 	handle @api {
-		reverse_proxy api:18080
+		reverse_proxy {$SERVICE_PRIVATE_DOMAIN}:18080 {
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-Host {host}
+		}
 	}
 
 	@app host {$APP_HOST}
 	handle @app {
-		reverse_proxy consumer-web:18081
+		reverse_proxy {$SERVICE_PRIVATE_DOMAIN}:18081 {
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-Host {host}
+		}
 	}
 
 	@admin host {$ADMIN_HOST}
 	handle @admin {
-		reverse_proxy admin-web:18082
+		reverse_proxy {$SERVICE_PRIVATE_DOMAIN}:18082 {
+			header_up X-Forwarded-Proto https
+			header_up X-Forwarded-Host {host}
+		}
 	}
 
 	handle {
