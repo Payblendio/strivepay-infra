@@ -1,0 +1,19 @@
+{
+	email ops@strivepay.io
+}
+
+api.staging.strivepay.io {
+	encode zstd gzip
+	reverse_proxy api:18080
+}
+
+staging.strivepay.io {
+	encode zstd gzip
+	reverse_proxy consumer-web:18081
+}
+
+cockpit.staging.strivepay.io {
+	encode zstd gzip
+	reverse_proxy admin-web:18082
+}
+
